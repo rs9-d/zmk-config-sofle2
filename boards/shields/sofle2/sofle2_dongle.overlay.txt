@@ -1,0 +1,85 @@
+#include <dt-bindings/zmk/matrix_transform.h>
+
+/ {
+    chosen {
+        zmk,kscan = &mock_kscan;
+    };
+
+    mock_kscan: mock_kscan_0 {
+        compatible = "zmk,kscan-mock";
+        columns = <0>;
+        rows = <0>;
+        events = <0>;
+    };
+    #include <dt-bindings/zmk/keys.h>
+
+    #define BASE 0
+    #define LOWER 1
+    #define RAISE 2
+    #define ADJUST 3
+
+    &mt { hold-trigger-on-release; };
+
+    / {
+        // Activate ADJUST layer by pressing raise and lower
+
+        conditional_layers {
+            compatible = "zmk,conditional-layers";
+
+            adjust_layer {
+                if-layers = <3 3>;
+                then-layer = <5>;
+            };
+        };
+
+        behaviors {
+            paste: paste {
+                compatible = "zmk,behavior-tap-dance";
+                label = "PASTE";
+                #binding-cells = <0>;
+                bindings = <&mt LC(V) V>, <&kp LC(LA(LS(V)))>;
+            };
+
+            lyr1or2: lyr1or2 {
+                compatible = "zmk,behavior-hold-tap";
+                label = "LYR1OR2";
+                bindings = <&tog>, <&tog>;
+
+                #binding-cells = <2>;
+                tapping-term-ms = <400>;
+            };
+
+            shft_cap: shft_cap {
+                compatible = "zmk,behavior-tap-dance";
+                label = "SHFT_CAP";
+                #binding-cells = <0>;
+                bindings = <&kp LEFT_SHIFT>, <&kp CAPS>;
+            };
+
+            tognotap: tognotap {
+                compatible = "zmk,behavior-hold-tap";
+                label = "TOGNOTAP";
+                bindings = <&tog>, <&none>;
+
+                #binding-cells = <2>;
+                tapping-term-ms = <200>;
+            };
+
+            lyr_pk: lyr_pk {
+                compatible = "zmk,behavior-tap-dance";
+                label = "LYR_PK";
+                #binding-cells = <0>;
+                bindings = <&tognotap 1 0>, <&tognotap 2 0>;
+            };
+
+            lyr_pk2: lyr_pk2 {
+                compatible = "zmk,behavior-mod-morph";
+                label = "LYR_PK2";
+                bindings = <&tog 1>, <&tog 2>;
+
+                #binding-cells = <0>;
+                mods = <(MOD_LSFT)>;
+            };
+        };
+    };
+};
